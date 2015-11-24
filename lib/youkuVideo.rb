@@ -50,7 +50,7 @@ module YoukuVideo
     end
 
     def self.getVideoURL(url, type)
-      matches = /id_([a-zA-Z0-9]*)/.match video.web_url
+      matches = /id_([a-zA-Z0-9]*)/.match url
       if !matches.nil?
         vid = matches[1]
         content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12")
