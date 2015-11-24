@@ -50,13 +50,18 @@ module YoukuVideo
     end
 
     def self.getVideoURL(url, type)
-      vid = url.split("id_").last.split(".").first
-      content = RestClient.get("http://v.youku.com/player/getPlayList/VideoIDS/#{vid}/Pf/4/ctype/12/ev/1")
-      json = JSON.parse(content)
-      ip = json["data"][0]["ip"]
-      ep = json["data"][0]["ep"]
-      ep,sid,token = getEp(vid, ep)
-      "http://pl.youku.com/playlist/m3u8?ctype=12&ep=#{ep}&ev=1&keyframe=1&oip=#{ip}&sid=#{sid}&token=#{token}&type=#{type}&vid=#{vid}"
+      matches = /id_([a-zA-Z0-9]*)/.match video.web_url
+      if !matches.nil?
+        vid = matches[1]
+        content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12")
+        json = JSON.parse(content)
+        ip = json["data"]["security"]["ip"]
+        ep = json["data"]["security"]["encrypt_string"]
+        ep,sid,token = getEp(vid, ep)
+        "http://pl.youku.com/playlist/m3u8?ctype=12&ep=#{ep}&ev=1&keyframe=1&oip=#{ip}&sid=#{sid}&token=#{token}&type=#{type}&vid=#{vid}"
+      else
+        ""
+      end
     end
   end
 end
