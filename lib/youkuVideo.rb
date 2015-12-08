@@ -53,7 +53,7 @@ module YoukuVideo
       matches = /id_([a-zA-Z0-9]*)/.match url
       if !matches.nil?
         vid = matches[1]
-        content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12")
+        content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12", :referer => 'http://static.youku.com')
         json = JSON.parse(content)
         ip = json["data"]["security"]["ip"]
         ep = json["data"]["security"]["encrypt_string"]
