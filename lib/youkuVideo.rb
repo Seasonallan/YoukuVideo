@@ -54,13 +54,17 @@ module YoukuVideo
       if !matches.nil?
         vid = matches[1]
         content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12", :referer => 'http://static.youku.com')
+        cookie_r = ""
+        unless content.cookies.nil?
+          cookie_r = content.cookies['r']
+        end
         json = JSON.parse(content)
         ip = json["data"]["security"]["ip"]
         ep = json["data"]["security"]["encrypt_string"]
         ep,sid,token = getEp(vid, ep)
-        "http://pl.youku.com/playlist/m3u8?ctype=12&ep=#{ep}&ev=1&keyframe=1&oip=#{ip}&sid=#{sid}&token=#{token}&type=#{type}&vid=#{vid}"
+        return "http://pl.youku.com/playlist/m3u8?ctype=12&ep=#{ep}&ev=1&keyframe=1&oip=#{ip}&sid=#{sid}&token=#{token}&vid=#{vid}&type=#{type}", cookie_r
       else
-        ""
+        return "", ""
       end
     end
   end
