@@ -49,11 +49,36 @@ module YoukuVideo
       return URI.encode(epNew), sid, token
     end
 
-    def self.getVideoURL(url, type)
+    def self.getPvid(len)
+      randchar = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+        "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+
+      r = ""
+      seconds = (Time.now.to_f * 1000).to_i.to_s # DateTime.now.strftime('%Q')
+
+      for i in 0..len-1
+        index = rand(999999) % randchar.length
+        r += randchar[index]
+      end
+
+      seconds + r
+    end
+
+    def self.getVideoURL(url, type, client_ip)
       matches = /id_([a-zA-Z0-9]*)/.match url
       if !matches.nil?
         vid = matches[1]
-        content = RestClient.get("http://play.youku.com/play/get.json?vid=#{vid}&ct=12", :referer => 'http://static.youku.com')
+        pvid = getPvid(6)
+        content = RestClient.get(
+          "http://play.youku.com/play/get.json?vid=#{vid}&ct=12",
+          :Referer => url,
+          :Cookie => "__ysuid=#{pvid};",
+          "X-FORWARDED-FOR" => client_ip,
+          'CLIENT-IP' => client_ip
+        )
         cookie_r = ""
         unless content.cookies.nil?
           cookie_r = content.cookies['r']
